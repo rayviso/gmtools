@@ -50,8 +50,7 @@ public class Main {
         return result;
     }
 
-
-    // 获取去掉16
+    // 获取去掉16个字节
     public static byte[] getLose16Byte(byte[] source) {
         validateArray(source);
         int splitIndex = source.length - 16;
@@ -83,17 +82,16 @@ public class Main {
     }
 
     public static void SM4Test() {
+
+        // 设置加密key和cbc的初始向量iv
         byte[] key = "qazxswed89iujkmn".getBytes();
         byte[] iv = "0011223344556677".getBytes();
 
-
-
-
-        // String s = "abc";
+        String s = "abc";
         // String s = "0123456789abcdefg"; // n77N8rUppK7UUYzzzdDwucbAaiwRRKtKSY0UHCB1f1M=
-        String s = "0123456789abcdefg0123456789abcdefg"; // n77N8rUppK7UUYzzzdDwufelqj78k5BIRUVA9t2i1FXCEQ1Q3UF/oeRha3aYGU5/
+        // String s = "0123456789abcdefg0123456789abcdefg"; // n77N8rUppK7UUYzzzdDwufelqj78k5BIRUVA9t2i1FXCEQ1Q3UF/oeRha3aYGU5/
         int sLength = s.getBytes().length;
-        int x = (int)Math.ceil((double)sLength / Sm4Cbc.BLOCK_SIZE);
+        int x = (int) Math.ceil((double) sLength / Sm4Cbc.BLOCK_SIZE);
         byte[] ciphertext = new byte[Sm4Cbc.BLOCK_SIZE * (x + 1)];
 
         int cipherlen;
@@ -106,11 +104,11 @@ public class Main {
         cipherlen = sm4Cbc.update(s.getBytes(), 0, sLength, ciphertext, 0);
         cipherlen += sm4Cbc.doFinal(ciphertext, cipherlen);
 
-        int y = (int)Math.ceil((double) cipherlen / Sm4Cbc.BLOCK_SIZE);
+        int y = (int) Math.ceil((double) cipherlen / Sm4Cbc.BLOCK_SIZE);
         byte[] plaintext = new byte[Sm4Cbc.BLOCK_SIZE * (y + 1)];
 
         String base64Str = Base64.getEncoder().encodeToString(getLose16Byte(ciphertext));
-        System.out.printf(base64Str);
+        System.out.printf(s + "的SM4密文是<CBC模式>： " + base64Str);
         System.out.print("\n");
 
         sm4Cbc.init(key, iv, decrypt);
@@ -129,12 +127,20 @@ public class Main {
         System.out.print("\n");
 
         base64Str = base64ToString(base64Str);
-        System.out.printf("明文： " + base64Str);
+        System.out.printf("明文解密后： " + base64Str);
         System.out.print("\n");
     }
 
 
     public static void SM2Test() {
+        String cert = "/Users/tommy/cert/certs.pem";
+
+        Sm2Certificate sm2Certificate = new Sm2Certificate();
+        sm2Certificate.importPem(cert);
+
+        System.out.printf(sm2Certificate.getIssuer().toString() + "\n");
+        System.out.printf(new String(sm2Certificate.getSerialNumber(), StandardCharsets.ISO_8859_1));
+
 
     }
 
@@ -163,9 +169,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        // SM2Test();
+        SM2Test();
         // SM3Test();
-        SM4Test();
+        // SM4Test();
 
     }
 }
